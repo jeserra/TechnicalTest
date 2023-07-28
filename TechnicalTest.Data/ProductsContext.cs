@@ -5,10 +5,7 @@ namespace TechnicalTest.Data
 {
     public class ProductsContext: DbContext
     {
-       /* public ProductsContext(DbContextOptionsBuilder optionsBuilder) 
-        {
-            
-        }*/
+        
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
 
@@ -20,8 +17,13 @@ namespace TechnicalTest.Data
                 .HasForeignKey(p => p.CategoryCode)
                 .HasPrincipalKey(b => b.Code);
         }
+        public ProductsContext(DbContextOptions<ProductsContext> dbContextOptions)
+       : base(dbContextOptions)
+        {
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-           => optionsBuilder.UseNpgsql("Host=localhost;Database=productv1;Username=postgres;Password=!qazxsw2");
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //   => optionsBuilder.UseNpgsql("Host=localhost;Database=productv1;Username=postgres;Password=!qazxsw2");
     }
 }

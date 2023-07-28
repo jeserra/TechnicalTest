@@ -17,15 +17,51 @@ namespace TechnicalTest.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(int? PageNumber = 1, int? PageSize = 10, int? CategoryCode = 0, int? code = 0)
+        public IActionResult Get( bool sortAsc = true, string SortBy ="Code", int? PageNumber = 1, int? PageSize = 10, int? CategoryCode = 0, int? code = 0)
         {
-            return Ok(PagedList<Product>.ToPagedList(productsContext.Products
+            var result = sortAsc ? SortByAscending(productsContext.Products
                             .Where(x => x.Code == code || code  == 0)
-                            .Where(x => x.CategoryCode == CategoryCode || CategoryCode == 0)
-                            .AsQueryable<Product>()
-                            .AsNoTracking(),
+                            .Where(x => x.CategoryCode == CategoryCode || CategoryCode == 0)                            
+                            .AsNoTracking()
+                            .ToList(), SortBy) :
+                            SortByDescending(productsContext.Products
+                            .Where(x => x.Code == code || code  == 0)
+                            .Where(x => x.CategoryCode == CategoryCode || CategoryCode == 0)                          
+                            .AsNoTracking()
+                            .ToList(), SortBy);
+
+
+            return Ok(PagedList<Product>.ToPagedList(result,
                       PageNumber.Value,
                       PageSize.Value));
+        }
+
+        public static IQueryable<Product> SortByDescending(List<Product> categories, string sortBy)
+        {
+            switch (sortBy)
+            {
+                case "Code":
+                    return categories.OrderByDescending(c => c.Code).AsQueryable();
+                case "Name":
+                    return categories.OrderByDescending(c => c.Name).AsQueryable();
+                // Add more cases for other properties if needed
+                default:
+                    return categories.OrderByDescending(c => c.ID).AsQueryable();
+            }
+        }
+
+        public static IQueryable<Product> SortByAscending(List<Product> categories, string sortBy)
+        {
+            switch (sortBy)
+            {
+                case "Code":
+                    return categories.OrderBy(c => c.Code).AsQueryable();
+                case "Name":
+                    return categories.OrderBy(c => c.Name).AsQueryable();
+                // Add more cases for other properties if needed
+                default:
+                    return categories.OrderBy(c => c.ID).AsQueryable();
+            }
         }
     }
 }
